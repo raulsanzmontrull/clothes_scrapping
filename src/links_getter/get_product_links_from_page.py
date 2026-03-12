@@ -1,3 +1,7 @@
+"""
+Module for extracting product links from a collection page.
+"""
+
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -5,6 +9,15 @@ import argparse
 
 
 def get_product_links_from_page(url):
+    """
+    Extract valid product URLs from a collection page.
+    
+    Args:
+        url: URL of the collection page
+    
+    Returns:
+        Sorted list of valid product URLs
+    """
     valid_urls = []
     
     response = requests.get(url)

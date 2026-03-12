@@ -1,8 +1,21 @@
+"""
+Module for extracting all product links from a shop's homepage.
+"""
+
 import re
 import requests
 from bs4 import BeautifulSoup
 
 def get_valid_product_links(url="https://en.gb.scalperscompany.com"):
+    """
+    Extract all valid product URLs from a shop homepage.
+    
+    Args:
+        url: Base URL of the shop (default: Scalpers homepage)
+    
+    Returns:
+        Sorted list of valid product URLs
+    """
     valid_urls = []
     
     response = requests.get(url)

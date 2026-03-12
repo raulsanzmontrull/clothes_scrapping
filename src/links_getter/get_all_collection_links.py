@@ -1,3 +1,7 @@
+"""
+Module for extracting collection links from a shop homepage.
+"""
+
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -5,6 +9,15 @@ import argparse
 
 
 def get_collection_from_shop(url="https://en.gb.scalperscompany.com"):
+    """
+    Extract all valid collection URLs from a shop homepage.
+    
+    Args:
+        url: Base URL of the shop (default: Scalpers homepage)
+    
+    Returns:
+        Sorted list of valid collection URLs
+    """
     valid_urls = []
     
     response = requests.get(url)

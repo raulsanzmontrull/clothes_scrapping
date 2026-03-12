@@ -1,25 +1,39 @@
+"""
+Module for scraping all products from a single collection.
+"""
+
 import sys
 import os
 import json
 
-# Add the root directory to the PYTHONPATH
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from src.links_getter.get_product_links_from_page import get_product_links_from_page
 from src.scrapper.scrap import scrape_product
 
+
 def get_all_product_details(collection_url):
+    """
+    Scrape detailed information for all products in a collection.
+    
+    Args:
+        collection_url: URL of the product collection
+    
+    Returns:
+        List of product detail dictionaries
+    """
     product_links = get_product_links_from_page(collection_url)
     all_product_details = []
 
     for product_url in product_links:
         product_details = scrape_product(product_url)
         if isinstance(product_details, str):
-            product_details = json.loads(product_details)  # Parse the JSON string
+            product_details = json.loads(product_details)
         product_details['collection_url'] = collection_url
         all_product_details.append(product_details)
 
     return all_product_details
+
 
 if __name__ == "__main__":
     import argparse

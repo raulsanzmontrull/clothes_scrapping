@@ -1,8 +1,19 @@
+"""
+Utility module for extracting the first valid product link from a shop.
+"""
+
 import re
 import requests
 from bs4 import BeautifulSoup
 
+
 def get_first_product_link():
+    """
+    Get the first valid product URL from the shop homepage.
+    
+    Returns:
+        First valid product URL or error message
+    """
     url_to_shop = "https://en.gb.scalperscompany.com"
     response = requests.get(url_to_shop)
     if response.status_code == 200:
@@ -21,6 +32,7 @@ def get_first_product_link():
                 print("No products found")
     else:
         print(f"Failed to fetch the main page. Status code: {response.status_code}")
+
 
 if __name__ == "__main__":
     get_first_product_link()
