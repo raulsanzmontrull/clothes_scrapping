@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  scraper:
+    build: .
+    container_name: clothes-scraper
+    volumes:
+      - ./output:/srv/project/output
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "python -m src.scrapper.scrap https://en.gb.scalperscompany.com/products/bbcstudio24-44361-fill-ruffle-skirt-ss24-lilac"
+
+  scraper-collection:
+    build: .
+    container_name: clothes-scraper-collection
+    volumes:
+      - ./output:/srv/project/output
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "python -m app.modules.get_all_products_from_collection https://en.gb.scalperscompany.com/collections/woman-new-collection-skirts-2060"
+
+  scraper-shop:
+    build: .
+    container_name: clothes-scraper-shop
+    volumes:
+      - ./output:/srv/project/output
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "python -m app.modules.get_all_products_from_shop"
+
+  test:
+    build: .
+    container_name: clothes-scraper-test
+    command: >
+      sh -c "python -m unittest discover -s tests -v"
