@@ -37,7 +37,7 @@ run_example_product_auto:
 
 run_example_product:
 	# Just to make this example more generic, it will be suitable to call to a category page and run the example with the first item (if exists)
-	docker exec -it scrapper_cont poetry run python src/scrapper/scrap.py "https://en.gb.scalperscompany.com/products/bbcstudio24-44361-fill-ruffle-skirt-ss24-lilac"
+	docker exec -it scrapper_cont poetry run python src/scrapper/scrap.py "https://en.gb.scalperscompany.com/products/65321-sccollar-bomber-jacket-ss26-red"
 
 ## Collection
 run_example_collection:
@@ -91,3 +91,35 @@ rebuild_and_up:
 rebuild_and_up_no_cache:
 	make stop_rm_all
 	make build_up_no_cache
+
+# ============================================================================
+# Local Development Commands (without Docker)
+# ============================================================================
+
+# Scrape a single product
+scrape-product:
+	python3 -m src.scrapper.scrap $(url)
+
+# Get all product links from a collection
+scrape-collection-links:
+	python3 -m src.links_getter.get_product_links_from_page $(url)
+
+# Get all collections from shop
+scrape-collections:
+	python3 -m src.links_getter.get_all_collection_links
+
+# Get first product link from shop
+scrape-first-product:
+	python3 -m src.test.get_link_first_product
+
+# Scrape all products from a collection (SLOW - may take hours)
+scrape-collection-products:
+	python3 -m app.modules.get_all_products_from_collection $(url)
+
+# Scrape all products from entire shop (VERY SLOW - may take days)
+scrape-shop-products:
+	python3 -m app.modules.get_all_products_from_shop
+
+# Run all tests
+test:
+	python3 -m unittest discover -s tests -v
