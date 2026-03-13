@@ -59,7 +59,7 @@ jobs:
       
       - name: Build Docker image
         run: |
-          docker build -t clothes-scraper .
+          docker build --no-cache -t clothes-scraper .
           
       - name: Verify Docker build
         run: |
