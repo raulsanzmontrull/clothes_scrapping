@@ -9,7 +9,7 @@ WORKDIR /srv/project/
 
 COPY pyproject.toml README.md /srv/project/
 
-RUN poetry install --no-root
+RUN poetry lock && poetry install --no-root
 
 COPY app /srv/project/app
 COPY assets /srv/project/assets
