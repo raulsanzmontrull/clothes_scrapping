@@ -2,7 +2,6 @@
 Utility module for extracting the first valid product link from a shop.
 """
 
-import re
 import requests
 from bs4 import BeautifulSoup
 

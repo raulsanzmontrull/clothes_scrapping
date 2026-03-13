@@ -51,7 +51,7 @@ def get_all_product_details(collection_url: str, max_workers: int = 5,
     Returns:
         List of product detail dictionaries
     """
-    print(f"Getting product links from collection...")
+    print("Getting product links from collection...")
     product_links = get_product_links_from_page(collection_url, validate=validate_links)
     
     if not product_links:
@@ -80,12 +80,9 @@ def get_all_product_details(collection_url: str, max_workers: int = 5,
                     )
                     
                     # Extract product name first
-                    product_name = ""
                     title_elem = soup.find('h1', class_='title-h3')
                     if not title_elem:
                         title_elem = soup.find('h1', class_='ProductMeta__Title')
-                    if title_elem:
-                        product_name = title_elem.get_text(strip=True)
                     
                     data_dict = {"product_url": result['url']}
                     

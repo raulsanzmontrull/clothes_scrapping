@@ -7,9 +7,9 @@ RUN mkdir /srv/project/
 
 WORKDIR /srv/project/
 
-COPY pyproject.toml /srv/project/
+COPY pyproject.toml README.md /srv/project/
 
-RUN poetry install
+RUN poetry install --no-root
 
 COPY app /srv/project/app
 COPY assets /srv/project/assets

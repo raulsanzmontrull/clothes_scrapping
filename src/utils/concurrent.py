@@ -8,8 +8,6 @@ import aiohttp
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any, Callable, Optional
-from functools import partial
-import time
 
 
 DEFAULT_HEADERS = {

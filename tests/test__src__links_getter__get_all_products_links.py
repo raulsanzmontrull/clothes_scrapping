@@ -1,7 +1,5 @@
 import unittest
 from unittest.mock import patch, Mock
-import requests
-from bs4 import BeautifulSoup
 import sys
 import os
 

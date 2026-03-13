@@ -2,7 +2,6 @@
 Module for extracting collection links from a shop homepage.
 """
 
-import re
 import requests
 from bs4 import BeautifulSoup
 import argparse
@@ -18,8 +17,6 @@ def get_collection_from_shop(url="https://en.gb.scalperscompany.com"):
     Returns:
         Sorted list of valid collection URLs
     """
-    valid_urls = []
-    
     response = requests.get(url)
     if response.status_code != 200:
         raise ValueError(f"Failed to fetch the provided URL. Status code: {response.status_code}")

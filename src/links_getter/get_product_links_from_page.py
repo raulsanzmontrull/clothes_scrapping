@@ -3,7 +3,6 @@ Module for extracting product links from a collection page.
 Uses concurrent processing for faster URL validation.
 """
 
-import re
 import requests
 from bs4 import BeautifulSoup
 import argparse
