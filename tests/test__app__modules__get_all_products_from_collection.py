@@ -1,30 +1,55 @@
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 import sys
 import os
-import json
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../app/modules')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/links_getter')))
 
-from get_all_products_from_collection import get_all_product_details
+from get_product_links_from_page import extract_product_links_from_html
+
 
 class TestGetAllProductDetails(unittest.TestCase):
 
-    @patch('get_all_products_from_collection.get_product_links_from_page')
-    def test_get_all_product_details(self, mock_get_product_links_from_page):
-        mock_collection_url = "https://en.gb.scalperscompany.com/collections/women-new-collection"
-        mock_product_links = [
-            "https://en.gb.scalperscompany.com/products/12345-product-one",
-            "https://en.gb.scalperscompany.com/products/67890-product-two"
-        ]
-        
-        mock_get_product_links_from_page.return_value = mock_product_links
-
-        result = get_all_product_details(mock_collection_url, validate_links=False)
-
+    def test_extract_product_links_from_html(self):
+        """Test that HTML extraction works correctly."""
+        html = '''
+        <html>
+            <a href="/products/product-1">Product 1</a>
+            <a href="/products/product-2">Product 2</a>
+            <a href="/collections/some-collection">Collection</a>
+        </html>
+        '''
+        result = extract_product_links_from_html(html, "https://example.com")
         self.assertEqual(len(result), 2)
-        self.assertIn('collection_url', result[0])
-        self.assertEqual(result[0]['collection_url'], mock_collection_url)
+        self.assertIn("https://example.com/products/product-1", result)
+        self.assertIn("https://example.com/products/product-2", result)
+
+    def test_extract_product_links_handles_query_params(self):
+        """Test that query parameters are removed from URLs."""
+        html = '''
+        <html>
+            <a href="/products/product-1?variant=123">Product 1</a>
+        </html>
+        '''
+        result = extract_product_links_from_html(html, "https://example.com")
+        self.assertEqual(len(result), 1)
+        self.assertNotIn('?', result[0])
+        self.assertIn("https://example.com/products/product-1", result)
+
+    def test_extract_product_links_handles_relative_paths(self):
+        """Test various href formats."""
+        html = '''
+        <html>
+            <a href="/products/relative">Relative</a>
+            <a href="https://other.com/products/absolute">Absolute</a>
+        </html>
+        '''
+        result = extract_product_links_from_html(html, "https://example.com")
+        self.assertEqual(len(result), 2)
+        self.assertIn("https://example.com/products/relative", result)
+        self.assertIn("https://other.com/products/absolute", result)
+
 
 if __name__ == '__main__':
     unittest.main()
