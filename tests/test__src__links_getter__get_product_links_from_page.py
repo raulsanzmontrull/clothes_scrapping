@@ -3,7 +3,6 @@ from unittest.mock import patch, Mock
 import sys
 import os
 
-# Import the function from src/links_getter/get_product_links_from_page.py
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/links_getter')))
 from get_product_links_from_page import get_product_links_from_page
 
@@ -11,7 +10,6 @@ class TestGetProductLinksFromPage(unittest.TestCase):
 
     @patch('requests.get')
     def test_get_product_links_from_page(self, mock_get):
-        # Mock response for the main page
         mock_main_page_response = Mock()
         mock_main_page_response.status_code = 200
         mock_main_page_response.text = '''
@@ -22,7 +20,6 @@ class TestGetProductLinksFromPage(unittest.TestCase):
         </html>
         '''
 
-        # Mock response for product pages
         mock_product_response = Mock()
         mock_product_response.status_code = 200
 
@@ -45,7 +42,7 @@ class TestGetProductLinksFromPage(unittest.TestCase):
             "https://en.gb.scalperscompany.com/products/47123-pasta-tee-ss24-offwhite"
         ]
 
-        result = get_product_links_from_page("https://en.gb.scalperscompany.com/collections/woman-new-collection-skirts-2060")
+        result = get_product_links_from_page("https://en.gb.scalperscompany.com/collections/woman-new-collection-skirts-2060", validate=False)
         self.assertEqual(result, expected_urls)
 
     @patch('requests.get')

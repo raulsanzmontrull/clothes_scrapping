@@ -1,83 +1,54 @@
 import unittest
-from unittest.mock import patch, Mock
 import sys
 import os
-import json
 
-# Add the app/modules directory to the system path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../app/modules')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/links_getter')))
 
-from get_all_products_from_collection import get_all_product_details
+from get_product_links_from_page import extract_product_links_from_html
+
 
 class TestGetAllProductDetails(unittest.TestCase):
 
-    @patch('get_all_products_from_collection.get_product_links_from_page')
-    @patch('get_all_products_from_collection.scrape_product')
-    def test_get_all_product_details(self, mock_scrape_product, mock_get_product_links_from_page):
-        # Mock data
-        mock_collection_url = "https://en.gb.scalperscompany.com/collections/women-new-collection"
-        mock_product_links = [
-            "https://en.gb.scalperscompany.com/products/12345-product-one",
-            "https://en.gb.scalperscompany.com/products/67890-product-two"
-        ]
-        mock_product_details = [
-            json.dumps({
-                'product_url': "https://en.gb.scalperscompany.com/products/12345-product-one",
-                'product_name': "Product One",
-                'sku': '12345',
-                'metadata': ['Feature 1', 'Feature 2'],
-                'images': ['https://image1.jpg', 'https://image2.jpg'],
-                'price': '£50',
-                'sizes': ['S', 'M', 'L'],
-                'colours': ['Red', 'Blue']
-            }),
-            json.dumps({
-                'product_url': "https://en.gb.scalperscompany.com/products/67890-product-two",
-                'product_name': "Product Two",
-                'sku': '67890',
-                'metadata': ['Feature A', 'Feature B'],
-                'images': ['https://image3.jpg', 'https://image4.jpg'],
-                'price': '£70',
-                'sizes': ['M', 'L', 'XL'],
-                'colours': ['Green', 'Yellow']
-            })
-        ]
+    def test_extract_product_links_from_html(self):
+        """Test that HTML extraction works correctly."""
+        html = '''
+        <html>
+            <a href="/products/product-1">Product 1</a>
+            <a href="/products/product-2">Product 2</a>
+            <a href="/collections/some-collection">Collection</a>
+        </html>
+        '''
+        result = extract_product_links_from_html(html, "https://example.com")
+        self.assertEqual(len(result), 2)
+        self.assertIn("https://example.com/products/product-1", result)
+        self.assertIn("https://example.com/products/product-2", result)
 
-        # Set up the mocks
-        mock_get_product_links_from_page.return_value = mock_product_links
-        mock_scrape_product.side_effect = mock_product_details
+    def test_extract_product_links_handles_query_params(self):
+        """Test that query parameters are removed from URLs."""
+        html = '''
+        <html>
+            <a href="/products/product-1?variant=123">Product 1</a>
+        </html>
+        '''
+        result = extract_product_links_from_html(html, "https://example.com")
+        self.assertEqual(len(result), 1)
+        self.assertNotIn('?', result[0])
+        self.assertIn("https://example.com/products/product-1", result)
 
-        # Expected result
-        expected_result = [
-            {
-                'product_url': "https://en.gb.scalperscompany.com/products/12345-product-one",
-                'product_name': "Product One",
-                'sku': '12345',
-                'metadata': ['Feature 1', 'Feature 2'],
-                'images': ['https://image1.jpg', 'https://image2.jpg'],
-                'price': '£50',
-                'sizes': ['S', 'M', 'L'],
-                'colours': ['Red', 'Blue'],
-                'collection_url': mock_collection_url
-            },
-            {
-                'product_url': "https://en.gb.scalperscompany.com/products/67890-product-two",
-                'product_name': "Product Two",
-                'sku': '67890',
-                'metadata': ['Feature A', 'Feature B'],
-                'images': ['https://image3.jpg', 'https://image4.jpg'],
-                'price': '£70',
-                'sizes': ['M', 'L', 'XL'],
-                'colours': ['Green', 'Yellow'],
-                'collection_url': mock_collection_url
-            }
-        ]
+    def test_extract_product_links_handles_relative_paths(self):
+        """Test various href formats."""
+        html = '''
+        <html>
+            <a href="/products/relative">Relative</a>
+            <a href="https://other.com/products/absolute">Absolute</a>
+        </html>
+        '''
+        result = extract_product_links_from_html(html, "https://example.com")
+        self.assertEqual(len(result), 2)
+        self.assertIn("https://example.com/products/relative", result)
+        self.assertIn("https://other.com/products/absolute", result)
 
-        # Run the function
-        result = get_all_product_details(mock_collection_url)
-
-        # Assert the result
-        self.assertEqual(result, expected_result)
 
 if __name__ == '__main__':
     unittest.main()

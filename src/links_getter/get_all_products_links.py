@@ -2,7 +2,6 @@
 Module for extracting all product links from a shop's homepage.
 """
 
-import re
 import requests
 from bs4 import BeautifulSoup
 

@@ -133,10 +133,11 @@ def split_currency_amount(s):
         'date_time_of_conversion': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     
-    add_price = lambda target_currency: (
-        f"price_in_{target_currency}", 
-        round(amount, 2) if code_currency == target_currency else round(amount * get_last_price(google_finance_url + code_currency + "-" + target_currency), 2)
-    )
+    def add_price(target_currency):
+        return (
+            f"price_in_{target_currency}", 
+            round(amount, 2) if code_currency == target_currency else round(amount * get_last_price(google_finance_url + code_currency + "-" + target_currency), 2)
+        )
     
     currency_dict.update(dict(map(add_price, target_currencies)))
     return currency_dict
@@ -485,7 +486,7 @@ def extract_data(soup, class_name, url=""):
                         desc = data.get('description')
                         if desc:
                             return desc
-            except:
+            except Exception:
                 pass
         
         return ""
@@ -528,10 +529,9 @@ def scrape_product(url):
     for class_name in class_to_tag:
         data = extract_data(soup, class_name, url)
         if data and class_name == "price":
-            update_data_dict = lambda d, u: d.update(u)
             data_dict_prices = split_currency_amount(data)
             for key, value in data_dict_prices.items():
-                update_data_dict(data_dict, {key: value})
+                data_dict.update({key: value})
             continue
         if data:
             data_dict[class_to_key[class_name]] = data
