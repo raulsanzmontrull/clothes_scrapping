@@ -12,26 +12,39 @@ from functools import partial
 import time
 
 
+DEFAULT_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+}
+
+
 class ConcurrentScraper:
     """
     Thread-based concurrent scraper using ThreadPoolExecutor.
     Uses requests.Session() for connection pooling.
     """
     
-    def __init__(self, max_workers: int = 10, timeout: int = 30):
+    def __init__(self, max_workers: int = 10, timeout: int = 30, headers: Dict[str, str] = None):
         """
         Initialize concurrent scraper.
         
         Args:
             max_workers: Maximum number of concurrent threads
             timeout: Request timeout in seconds
+            headers: Optional custom headers (merged with defaults)
         """
         self.max_workers = max_workers
         self.timeout = timeout
         self.session = None
+        self.headers = {**DEFAULT_HEADERS, **(headers or {})}
     
     def __enter__(self):
         self.session = requests.Session()
+        self.session.headers.update(self.headers)
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -133,22 +146,24 @@ class AsyncScraper:
     Async scraper using aiohttp for high-performance concurrent scraping.
     """
     
-    def __init__(self, max_concurrent: int = 20, timeout: int = 30):
+    def __init__(self, max_concurrent: int = 20, timeout: int = 30, headers: Dict[str, str] = None):
         """
         Initialize async scraper.
         
         Args:
             max_concurrent: Maximum number of concurrent requests
             timeout: Request timeout in seconds
+            headers: Optional custom headers (merged with defaults)
         """
         self.max_concurrent = max_concurrent
         self.timeout = aiohttp.ClientTimeout(total=timeout)
         self.semaphore = None
         self.session = None
+        self.headers = {**DEFAULT_HEADERS, **(headers or {})}
     
     async def __aenter__(self):
         self.semaphore = asyncio.Semaphore(self.max_concurrent)
-        self.session = aiohttp.ClientSession(timeout=self.timeout)
+        self.session = aiohttp.ClientSession(timeout=self.timeout, headers=self.headers)
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
